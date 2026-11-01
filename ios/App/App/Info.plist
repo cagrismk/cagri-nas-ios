@@ -67,6 +67,6 @@
     <key>UIViewControllerBasedStatusBarAppearance</key>
     <true />
     <key>NSPhotoLibraryUsageDescription</key>
-    <string>Çağrı NAS, fotoğraf ve videolarınızı kişisel NAS diskinize yedeklemek için fotoğraf arşivinize erişim ister.</string>
+    <string>Cagri NAS fotograf ve videolarinizi NAS diskinize yedeklemek icin erisim izni ister.</string>
   </dict>
 </plist>
