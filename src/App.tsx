@@ -1,3 +1,4 @@
+import { checkPhotoLibrary } from './photoBackup';
 import { enrollDevice, hasDevice, loginDevice } from './deviceAuth'
 import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
 import './App.css'
@@ -319,7 +320,21 @@ export default function App() {
         </button>)}</div>
         {!photosLoading&&!photosError&&!visibleMedia.length&&<div className="message">{photoFilter==='all'?'Resimlerim klasöründe fotoğraf veya video bulunamadı.':'Bu filtreye uygun medya bulunamadı.'}</div>}
       </>}
-      {tab==='settings'&&<><div className="section-heading"><h2>Ayarlar</h2></div><section className="storage-card"><div className="storage-head"><span className="storage-emoji">💾</span><div><strong>Toshiba HDD</strong><small>Depolama alanı</small></div><button onClick={()=>setStorageTick(x=>x+1)} aria-label="Disk bilgisini yenile">↻</button></div>{storageLoading?<p>Disk bilgileri yükleniyor…</p>:storageError?<p role="status">⚠️ {storageError}</p>:storage?.supported&&storage.total!==undefined&&storage.used!==undefined&&storage.free!==undefined?<><div className="storage-metrics"><div><small>Toplam</small><strong>{prettySize(storage.total)}</strong></div><div><small>Kullanılan</small><strong>{prettySize(storage.used)}</strong></div><div><small>Boş</small><strong>{prettySize(storage.free)}</strong></div></div><div className="storage-track"><div style={{width:`${storage.total>0?Math.min(100,Math.max(0,storage.used/storage.total*100)):0}%`}}/></div><small className="storage-pct">{storage.total>0?(storage.used/storage.total*100).toFixed(1):'0'}% kullanılıyor</small></>:<p>{storage?.reason||'Disk kapasitesi henüz okunamadı.'} Simple NAS kota bilgisini desteklemiyorsa başka veri kaynağı bağlayacağız.</p>}</section><section className="shares-card"><div className="shares-head"><h3>🔗 Paylaşılan Dosyalar</h3><button onClick={()=>setShareRecordsTick(x=>x+1)}>↻ Yenile</button></div>
+      {tab==='settings'&&<section className="info-card setting" style={{display:'block',marginBottom:16}}>
+  <h3>📸 Fotoğraf Yedekleme</h3>
+  <p>iPhone fotoğraf ve videolarını NAS'a otomatik yedekleme</p>
+  <button onClick={async()=>{
+    try {
+      const info=await checkPhotoLibrary();
+      alert(info.authorized
+        ? `Fotoğraf: ${info.photos}\nVideo: ${info.videos}\nToplam: ${info.total}${info.limited ? '\nYalnızca seçili fotoğraflara erişim var.' : ''}`
+        : 'Fotoğraf arşivine erişim izni verilmedi.');
+    } catch(e) {
+      alert('Fotoğraf erişim hatası: '+String(e));
+    }
+  }}>📱 iPhone Fotoğraflarını Kontrol Et</button>
+</section>}
+{tab==='settings'&&<><div className="section-heading"><h2>Ayarlar</h2></div><section className="storage-card"><div className="storage-head"><span className="storage-emoji">💾</span><div><strong>Toshiba HDD</strong><small>Depolama alanı</small></div><button onClick={()=>setStorageTick(x=>x+1)} aria-label="Disk bilgisini yenile">↻</button></div>{storageLoading?<p>Disk bilgileri yükleniyor…</p>:storageError?<p role="status">⚠️ {storageError}</p>:storage?.supported&&storage.total!==undefined&&storage.used!==undefined&&storage.free!==undefined?<><div className="storage-metrics"><div><small>Toplam</small><strong>{prettySize(storage.total)}</strong></div><div><small>Kullanılan</small><strong>{prettySize(storage.used)}</strong></div><div><small>Boş</small><strong>{prettySize(storage.free)}</strong></div></div><div className="storage-track"><div style={{width:`${storage.total>0?Math.min(100,Math.max(0,storage.used/storage.total*100)):0}%`}}/></div><small className="storage-pct">{storage.total>0?(storage.used/storage.total*100).toFixed(1):'0'}% kullanılıyor</small></>:<p>{storage?.reason||'Disk kapasitesi henüz okunamadı.'} Simple NAS kota bilgisini desteklemiyorsa başka veri kaynağı bağlayacağız.</p>}</section><section className="shares-card"><div className="shares-head"><h3>🔗 Paylaşılan Dosyalar</h3><button onClick={()=>setShareRecordsTick(x=>x+1)}>↻ Yenile</button></div>
         <div className="share-filters" role="group" aria-label="Paylaşım durumu">
           <button className={shareFilter==='active'?'active':''} onClick={()=>setShareFilter('active')}>Aktif ({shareRecords.filter(r=>!r.revoked&&r.expires>Date.now()).length})</button>
           <button className={shareFilter==='expired'?'active':''} onClick={()=>setShareFilter('expired')}>Süresi Dolan</button>
