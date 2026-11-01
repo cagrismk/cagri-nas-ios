@@ -6,13 +6,14 @@ const config: CapacitorConfig = {
   appName: '\u00c7a\u011fr\u0131 NAS',
   webDir: 'dist',
   server: {
-    url: 'https://test-nas.cagrismk.com',
+    url: 'https://cagri-nas.cagrismk.com',
     allowNavigation: [
-      'test-nas.cagrismk.com',
+      'cagri-nas.cagrismk.com',
       'cagrismk.cloudflareaccess.com'
     ]
   }
 };
 
 export default config;
+
 
