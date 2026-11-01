@@ -31,6 +31,10 @@ jobs:
       - name: Sync Capacitor iOS
         run: npx cap sync ios
 
+      - name: Validate iOS Info.plist
+        run: |
+          plutil -lint ios/App/App/Info.plist
+          /usr/libexec/PlistBuddy -c "Print :NSPhotoLibraryUsageDescription" ios/App/App/Info.plist
       - name: Build unsigned iOS application
         run: |
           xcodebuild \
