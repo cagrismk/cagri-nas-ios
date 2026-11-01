@@ -1,4 +1,4 @@
-import { checkPhotoLibrary } from './photoBackup';
+import { checkPhotoLibrary, listPhotoAssets } from './photoBackup';
 import { enrollDevice, hasDevice, loginDevice } from './deviceAuth'
 import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
 import './App.css'
@@ -328,6 +328,19 @@ export default function App() {
   <button onClick={async()=>{
     try {
       const info=await checkPhotoLibrary();
+      if (info.authorized) {
+        const result = await listPhotoAssets();
+        const sample = result.assets.slice(0, 3)
+          .map(a => `${a.type}: ${a.id}`)
+          .join('\n');
+
+        alert(
+          `Toplam: ${result.total}\n` +
+          `İlk 3 dosya:\n${sample}\n` +
+          (result.limited ? 'Sınırlı fotoğraf erişimi' : 'Tam fotoğraf erişimi')
+        );
+        return;
+      }
       alert(info.authorized
         ? `Fotoğraf: ${info.photos}\nVideo: ${info.videos}\nToplam: ${info.total}${info.limited ? '\nYalnızca seçili fotoğraflara erişim var.' : ''}`
         : 'Fotoğraf arşivine erişim izni verilmedi.');

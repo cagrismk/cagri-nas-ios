@@ -1,4 +1,4 @@
-﻿import { registerPlugin } from '@capacitor/core';
+import { registerPlugin } from '@capacitor/core';
 
 export interface PhotoLibraryInfo {
   authorized: boolean;
@@ -11,6 +11,7 @@ export interface PhotoLibraryInfo {
 
 export interface PhotoBackupPlugin {
   getLibraryInfo(): Promise<PhotoLibraryInfo>;
+  listAssets(): Promise<PhotoAssetList>;
 }
 
 export const PhotoBackup =
@@ -18,4 +19,23 @@ export const PhotoBackup =
 
 export async function checkPhotoLibrary(): Promise<PhotoLibraryInfo> {
   return PhotoBackup.getLibraryInfo();
+}
+
+
+export interface PhotoAsset {
+  id: string;
+  type: "photo" | "video";
+  createdAt: number;
+  width: number;
+  height: number;
+}
+
+export interface PhotoAssetList {
+  assets: PhotoAsset[];
+  total: number;
+  limited: boolean;
+}
+
+export async function listPhotoAssets(): Promise<PhotoAssetList> {
+  return PhotoBackup.listAssets();
 }

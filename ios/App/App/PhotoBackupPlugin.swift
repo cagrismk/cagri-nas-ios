@@ -1,4 +1,4 @@
-﻿import Foundation
+import Foundation
 import Capacitor
 import Photos
 
@@ -9,7 +9,8 @@ public class PhotoBackupPlugin: CAPPlugin, CAPBridgedPlugin {
     public let jsName = "PhotoBackup"
 
     public let pluginMethods: [CAPPluginMethod] = [
-        CAPPluginMethod(name: "getLibraryInfo", returnType: CAPPluginReturnPromise)
+        CAPPluginMethod(name: "getLibraryInfo", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "listAssets", returnType: CAPPluginReturnPromise)
     ]
 
     @objc func getLibraryInfo(_ call: CAPPluginCall) {
@@ -34,5 +35,38 @@ public class PhotoBackupPlugin: CAPPlugin, CAPBridgedPlugin {
                 "total": photos.count + videos.count
             ])
         }
+    }
+
+    @objc func listAssets(_ call: CAPPluginCall) {
+        let status = PHPhotoLibrary.authorizationStatus(for: .readWrite)
+
+        guard status == .authorized || status == .limited else {
+            call.reject("Fotograf arsivi erisim izni gerekli")
+            return
+        }
+
+        let options = PHFetchOptions()
+        options.sortDescriptors = [
+            NSSortDescriptor(key: "creationDate", ascending: true)
+        ]
+
+        let results = PHAsset.fetchAssets(with: options)
+        var assets: [[String: Any]] = []
+
+        results.enumerateObjects { asset, _, _ in
+            assets.append([
+                "id": asset.localIdentifier,
+                "type": asset.mediaType == .video ? "video" : "photo",
+                "createdAt": asset.creationDate?.timeIntervalSince1970 ?? 0,
+                "width": asset.pixelWidth,
+                "height": asset.pixelHeight
+            ])
+        }
+
+        call.resolve([
+            "assets": assets,
+            "total": assets.count,
+            "limited": status == .limited
+        ])
     }
 }
