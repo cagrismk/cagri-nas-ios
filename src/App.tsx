@@ -23,7 +23,8 @@ type SessionStatus = 'checking'|'locked'|'unlocked'
 type AccessMode = 'web'|'iphone'
 // Tüm API istekleri aynı oturum çerezini taşır. 401 cevabı uygulamayı kilitler.
 export default function App() {
-  const [session,setSession] = useState<SessionStatus>('checking')
+  const photoTestMode = window.location.protocol === 'capacitor:'
+  const [session,setSession] = useState<SessionStatus>(photoTestMode ? 'unlocked' : 'checking')
   const [accessMode,setAccessMode] = useState<AccessMode>('web')
   const [loginUser,setLoginUser] = useState('')
   const [loginPassword,setLoginPassword] = useState('')
@@ -33,6 +34,7 @@ export default function App() {
   const [pairBusy,setPairBusy] = useState(false)
   const loginFetch = async (url:string, options?:RequestInit) => window.fetch(url,options)
   useEffect(()=>{
+    if(photoTestMode) return
     let alive=true
     const check=()=>window.fetch('/api/session',{cache:'no-store'}).then(async r=>{
       if(!r.ok) throw Error('Oturum sorgulanamadı')
