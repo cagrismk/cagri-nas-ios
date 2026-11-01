@@ -9,9 +9,7 @@ type Entry = { name: string; path: string; type: 'folder' | 'file'; size: number
 const ROOT = '/Dosyalar/'
 const PHOTOS_FOLDER_NAME = 'Resimlerim'
 const apiListUrl = (folder: string) => {
-  const url = new URL('/api/files', window.location.origin)
-  url.searchParams.set('path', folder)
-  return url.toString()
+  return '/api/files?path=' + encodeURIComponent(folder)
 }
 const isImage = (s: string) => /\.(jpe?g|png|gif|webp|avif)$/i.test(s)
 const isVideo = (s: string) => /\.(mp4|webm|mov|m4v)$/i.test(s)
